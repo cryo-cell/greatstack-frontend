@@ -55,7 +55,7 @@ const Product = () => {
     updateAttributes(updatedAttributes);
   
     // Call the external function
-    updateAttributes(productId, updatedAttributes);
+    //updateAttributes( updatedAttributes);
   
     console.log("Updated Attributes:", updatedAttributes);
   };
@@ -122,6 +122,7 @@ const Product = () => {
           <div className="mt-5 text-3xl font-medium">
             {productData.attributes.map((attributeGroup, groupIndex) => (
               <div key={groupIndex}>
+              <h1>{attributeGroup.name}</h1>
                 <select onChange={handleAttributeChange}>
                   <option value="">select option</option>
                   {attributeGroup.map((attribute, attrIndex) => (

@@ -64,7 +64,7 @@ const ShopContextProvider = (props) => {
     console.log(cartData);
 
     // Generate a unique key combining itemId, size, and attributes
-    const attributeKey = generateUniqueKey(itemId, size, attributes);
+    const attributeKey = generateUniqueKey(itemId, size, productData.attributes);
     console.log("Generated attributeKey:", attributeKey);
 
     console.log("Product Data for this item:", productData);

@@ -33,17 +33,11 @@ function Cart() {
 
   // Generate a unique key based on size and attributes
   const generateUniqueKey = (itemId, size, attributes) => {
-    const stringifyAttributes = (attributes) => {
-      if (typeof attributes !== 'object' || attributes === null) {
-        return `${attributes}`;
-      }
-      return Object.entries(attributes)
-        .map(([key, value]) => `${key}:${typeof value === 'object' ? stringifyAttributes(value) : value}`)
-        .join("-");
-    };
+    // Extract only the first attribute key-value pair
+    const [selectedKey, selectedValue] = Object.entries(attributes)[0] || [];
   
-    const attributesKey = attributes ? stringifyAttributes(attributes) : '';
-    return `${itemId}-${size}-${attributesKey}`;
+    // Combine itemId, size, and the selected attribute for a unique key
+    return `${itemId}-${size}-${selectedKey}:${selectedValue}`;
   };
   
 
