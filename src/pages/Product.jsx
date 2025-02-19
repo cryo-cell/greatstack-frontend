@@ -67,10 +67,87 @@ const Product = () => {
     return productData.attributes.map((attributeGroup, groupIndex) => (
       <div key={groupIndex} className="mt-5">
         <h3 className="font-medium text-lg">{attributeGroup.name}</h3>
-        <div className="flex flex-wrap gap-2 mt-2"></div>
+        <div className="mt-2">
+          {attributeGroup.type === "select" && (
+            <select
+              value={selectedAttributes[attributeGroup.name] || ""}
+              onChange={(e) =>
+                handleAttributeChange(attributeGroup.name, e.target.value)
+              }
+              className="p-2 border rounded"
+            >
+              <option value="">Select an option</option>
+              {attributeGroup.map((attribute, attributeIndex) => (
+                <option key={attributeIndex} value={attribute.name}>
+                  {attribute.name}
+                </option>
+              ))}
+            </select>
+          )}
+  
+          {attributeGroup.type === "radio" && (
+            <div className="flex flex-wrap gap-2">
+              {attributeGroup.map((attribute, attributeIndex) => (
+                <label key={attributeIndex} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name={attributeGroup.name}
+                    value={attribute.name}
+                    checked={
+                      selectedAttributes[attributeGroup.name] === attribute.name
+                    }
+                    onChange={(e) =>
+                      handleAttributeChange(attributeGroup.name, e.target.value)
+                    }
+                    className="mr-2"
+                  />
+                  {attribute.name}
+                </label>
+              ))}
+            </div>
+          )}
+  
+          {attributeGroup.type === "checkbox" && (
+            <div className="flex flex-wrap gap-2">
+              {attributeGroup.map((attribute, attributeIndex) => (
+                <label key={attributeIndex} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name={`${attributeGroup.name}-${attribute.name}`}
+                    value={attribute.name}
+                    checked={
+                      selectedAttributes[attributeGroup.name]?.includes(
+                        attribute.name
+                      ) || false
+                    }
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      setSelectedAttributes((prev) => {
+                        const currentValues =
+                          prev[attributeGroup.name] || [];
+                        const updatedValues = isChecked
+                          ? [...currentValues, attribute.name]
+                          : currentValues.filter(
+                              (value) => value !== attribute.name
+                            );
+                        return {
+                          ...prev,
+                          [attributeGroup.name]: updatedValues,
+                        };
+                      });
+                    }}
+                    className="mr-2"
+                  />
+                  {attribute.name}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     ));
   };
+  
 
   if (!productData) {
     return <div className="opacity-0">Loading...</div>;
@@ -131,7 +208,89 @@ const Product = () => {
               </select>
             </div>
           ))*/}
-
+{productData.attributes.map((attributeGroup, groupIndex) => (
+      <div key={groupIndex} className="mt-5">
+        <h3 className="font-medium text-lg">{attributeGroup.name}</h3>
+        <div className="mt-2">
+          {attributeGroup.type === "select" && (
+            <select
+              value={selectedAttributes[attributeGroup.name] || ""}
+              onChange={(e) =>
+                handleAttributeChange(attributeGroup.name, e.target.value)
+              }
+              className="p-2 border rounded"
+            >
+              <option value="">Select an option</option>
+              {attributeGroup.map((attribute, attributeIndex) => (
+                <option key={attributeIndex} value={attribute.name}>
+                  {attribute.name}
+                </option>
+              ))}
+            </select>
+          )}
+  
+          {attributeGroup.type === "radio" && (
+            <div className="flex flex-wrap gap-2">
+              {attributeGroup.map((attribute, attributeIndex) => (
+                <label key={attributeIndex} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name={attributeGroup.name}
+                    value={attribute.name}
+                    checked={
+                      selectedAttributes[attributeGroup.name] === attribute.name
+                    }
+                    onChange={(e) =>
+                      handleAttributeChange(attributeGroup.name, e.target.value)
+                    }
+                    className="mr-2"
+                  />
+                  {attribute.name}
+                </label>
+              ))}
+            </div>
+          )}
+  
+          {attributeGroup.type === "checkbox" && (
+            <div className="flex flex-wrap gap-2">
+              {attributeGroup.map((attribute, attributeIndex) => (
+                <label key={attributeIndex} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name={`${attributeGroup.name}-${attribute.name}`}
+                    value={attribute.name}
+                    checked={
+                      selectedAttributes[attributeGroup.name]?.includes(
+                        attribute.name
+                      ) || false
+                    }
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      setSelectedAttributes((prev) => {
+                        const currentValues =
+                          prev[attributeGroup.name] || [];
+                        const updatedValues = isChecked
+                          ? [...currentValues, attribute.name]
+                          : currentValues.filter(
+                              (value) => value !== attribute.name
+                            );
+                        return {
+                          ...prev,
+                          [attributeGroup.name]: updatedValues,
+                        };
+                      });
+                    }}
+                    className="mr-2"
+                  />
+                  {attribute.name}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    ))
+  }
           {/* Render Attributes */}
           {productData.attributes.map((attributeGroup, groupIndex) => (
             <div key={groupIndex} className="mt-5">
@@ -139,24 +298,58 @@ const Product = () => {
             </div>
           ))}
           {productData.attributes.map((attributeGroup, groupIndex) => (
-            <div key={groupIndex} className="mt-5">
-              <h3 className="font-medium text-lg">{attributeGroup.name}</h3>
-              <select
-                value={selectedAttributes[`group-${groupIndex}`] || ""}
-                onChange={(e) =>
-                  handleAttributeChange(`group-${groupIndex}`, e.target.value)
-                }
-                className="p-2 border rounded"
-              >
-                <option value="">Select an option</option>
-                {attributeGroup.map((attribute, attributeIndex) => (
-                  <option key={attributeIndex} value={attribute.name}>
-                    {attribute.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
+  attributeGroup && (
+    <div key={groupIndex} className="mt-5">
+      <h3 className="font-medium text-lg">{attributeGroup.name}</h3>
+
+      {/* Render dropdown for "radio" */}
+      {attributeGroup.some((attribute) => attribute.type === "radio") && (
+        <select
+          value={selectedAttributes[`group-${groupIndex}`] || ""}
+          onChange={(e) =>
+            handleAttributeChange(`group-${groupIndex}`, e.target.value)
+          }
+          className="p-2 border rounded"
+        >
+          <option value="">Select an option</option>
+          {attributeGroup.map((attribute, attributeIndex) =>
+            attribute.type === "radio" ? (
+              <option key={attributeIndex} value={attribute.name}>
+                {attribute.name}
+              </option>
+            ) : null
+          )}
+        </select>
+      )}
+
+      {/* Render checkboxes for "checkbox" */}
+      {attributeGroup.map((attribute, attributeIndex) => (
+        attribute.type === "checkbox" && (
+          <label key={attributeIndex} className="block mt-2">
+            <input
+              type="checkbox"
+              name={attribute.name}
+              value={attribute.name}
+              checked={
+                selectedAttributes[`group-${groupIndex}`]?.includes(attribute.name) || false
+              }
+              onChange={(e) => {
+                const currentValues = selectedAttributes[`group-${groupIndex}`] || [];
+                const newValues = e.target.checked
+                  ? [...currentValues, attribute.name]
+                  : currentValues.filter((v) => v !== attribute.name);
+                handleAttributeChange(`group-${groupIndex}`, newValues);
+              }}
+              className="mr-2"
+            />
+            {attribute.name}
+          </label>
+        )
+      ))}
+    </div>
+  )
+))}
+
 
           {/* Size selection */}
           <div className="mt-5">
