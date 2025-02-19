@@ -27,21 +27,25 @@ const ShopContextProvider = (props) => {
   }, [cartItems]);
 
   // Generate a unique key for each combination of itemId, size, and attributes
-  const generateUniqueKey = (itemId, size, attributes) => {
+  const generateUniqueKey = (itemId, size, attributes = {}) => {
     const stringifyAttributes = (attributes) => {
-      if (typeof attributes !== 'object' || attributes === null) {
-        return attributes;
-      }
+      if (!attributes || typeof attributes !== "object") return "";
   
-      // Handle objects or arrays
       return Object.entries(attributes)
-        .map(([key, value]) => `${key}:${typeof value === 'object' ? stringifyAttributes(value) : value}`)
+        .map(([key, value]) => {
+          if (typeof value === "object" && value !== null) {
+            return `${key}:{${stringifyAttributes(value)}}`; // Recursively handle nested attributes
+          } else {
+            return `${key}:${value}`;
+          }
+        })
         .join("-");
     };
   
-    const attributesKey = attributes ? stringifyAttributes(attributes) : '';
-    return `${itemId}-${size}-${attributesKey}`; // Unique key combining itemId, size, and attributes
+    const attributesKey = stringifyAttributes(attributes);
+    return `${itemId}-${size}-${attributesKey}`; // Combine itemId, size, and attributes into a unique key
   };
+  
 
   // Updated addToCart to handle attributes
   const addToCart = async (itemId, size, price, attributes) => {
@@ -64,7 +68,7 @@ const ShopContextProvider = (props) => {
     console.log(cartData);
 
     // Generate a unique key combining itemId, size, and attributes
-    const attributeKey = generateUniqueKey(itemId, size, productData.attributes);
+    const attributeKey = generateUniqueKey(itemId, size, attributes);
     console.log("Generated attributeKey:", attributeKey);
 
     console.log("Product Data for this item:", productData);

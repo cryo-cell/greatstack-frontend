@@ -34,7 +34,7 @@ function Cart() {
   // Generate a unique key based on size and attributes
   const generateUniqueKey = (itemId, size, attributes) => {
     // Extract only the first attribute key-value pair
-    const [selectedKey, selectedValue] = Object.entries(attributes)[0] || [];
+    const [selectedKey, selectedValue] = attributes || [];
   
     // Combine itemId, size, and the selected attribute for a unique key
     return `${itemId}-${size}-${selectedKey}:${selectedValue}`;
@@ -53,14 +53,14 @@ function Cart() {
       if (typeof value === "object" && value !== null) {
         // If the value is an object, render it in a readable way
         return (
-          <div key={attributeKey}>
-            <strong>{key}:</strong> {JSON.stringify(value)} {/* or format as needed */}
+          <div key={JSON.stringify(attributeKey)}>
+            {JSON.stringify(value)} {/* or format as needed */}
           </div>
         );
       } else {
         return (
-          <div key={attributeKey} className="px-2 sm:px-13 sm:py-1 border bg-slate-50">
-            <strong>{key}:</strong> {value}
+          <div key={JSON.stringify(attributeKey)} className="px-2 sm:px-13 sm:py-1 border bg-slate-50">
+             {value}
           </div>
         );
       }

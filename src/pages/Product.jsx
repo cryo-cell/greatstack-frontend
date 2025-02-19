@@ -8,12 +8,24 @@ import { useAttributeContext } from "../context/AttributeContext";
 const Product = () => {
   const { productId } = useParams();
   const { products, currency, addToCart } = useContext(ShopContext);
-  const { selectedAttributes, updateAttributes } = useAttributeContext();
+  //const { selectedAttributes, updateAttributes } = useAttributeContext();
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
   const [selectedPrice, setSelectedPrice] = useState(null);
   const [selectedValue, setSelectedValue] = useState("");
+
+  const [selectedAttributes, setSelectedAttributes] = useState({});
+
+  useEffect(() => {
+    const selectedProduct = products.find((item) => item._id === productId);
+    if (selectedProduct) {
+      setProductData(selectedProduct);
+      console.log("Product Data:", selectedProduct); // Log attributes
+      setImage(selectedProduct.image[0]);
+      setSelectedPrice(selectedProduct.sizes[0]?.price); // Set default price from the first size
+    }
+  }, [productId, products]);
 
   // Fetch product data based on productId
   useEffect(() => {
@@ -26,40 +38,23 @@ const Product = () => {
     }
   }, [productId, products]);
 
+  useEffect(() => {
+    if (productData) {
+      console.log("Product Data:", productData);
+    }
+  }, [productData]);
+
   // Get selected attributes for this product
   const currentSelectedAttributes = selectedAttributes[productId] || {};
 
   // Handle attribute changes dynamically
-  let value = ""
-  const handleAttributeChange = (e, attributeName) => {
-    const newValue = e.target.value;
-  
-    // Check if the attribute already exists
-    const existingValues = currentSelectedAttributes[attributeName] || [];
-  
-    // Ensure the attribute is stored as an array
-    const updatedValues = Array.isArray(existingValues)
-      ? [...existingValues, newValue] // Add the new value to the array
-      : [newValue]; // If it's not an array, initialize it with the new value
-  
-    // Remove duplicates to prevent adding the same value multiple times
-    const uniqueUpdatedValues = [...new Set(updatedValues)];
-  
-    // Update the attributes object
-    const updatedAttributes = {
-      ...currentSelectedAttributes,
-      [attributeName]: uniqueUpdatedValues,
-    };
-  
-    // Update the state
-    updateAttributes(updatedAttributes);
-  
-    // Call the external function
-    //updateAttributes( updatedAttributes);
-  
-    console.log("Updated Attributes:", updatedAttributes);
+  const handleAttributeChange = (groupName, attributeName) => {
+    setSelectedAttributes((prevState) => ({
+      ...prevState,
+      [groupName]: attributeName,
+    }));
   };
-  
+  console.log(selectedAttributes)
 
   // Handle size selection
   const handleSizeChange = (size, price) => {
@@ -119,26 +114,47 @@ const Product = () => {
             {currency}
             {selectedPrice ? selectedPrice : productData.sizes[0]?.price}
           </div>
-          <div className="mt-5 text-3xl font-medium">
-            {productData.attributes.map((attributeGroup, groupIndex) => (
-              <div key={groupIndex}>
-              <h1>{attributeGroup.name}</h1>
-                <select onChange={handleAttributeChange}>
-                  <option value="">select option</option>
-                  {attributeGroup.map((attribute, attrIndex) => (
-                    <option key={attrIndex} value={attribute.name}>
-                      {attribute.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
-          </div>
+          <div className="mt-5 text-3xl font-medium"></div>
+          {/*productData.attributes.map((attributeGroup, groupIndex) => (
+            <div key={groupIndex} className="mt-5">
+              <h3 className="font-medium text-lg">{attributeGroup.name}</h3>
+              <select
+                value={currentSelectedAttributes[attributeGroup.name] || ""}
+                onChange={(e) => handleAttributeChange(e, attributeGroup.name)}
+              >
+                <option value="">Select option</option>
+                {attributeGroup.map((attribute, attrIndex) => (
+                  <option key={attrIndex} value={attribute}>
+                    {attribute.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))*/}
 
           {/* Render Attributes */}
           {productData.attributes.map((attributeGroup, groupIndex) => (
             <div key={groupIndex} className="mt-5">
               <h3 className="font-medium text-lg">{attributeGroup.name}</h3>
+            </div>
+          ))}
+          {productData.attributes.map((attributeGroup, groupIndex) => (
+            <div key={groupIndex} className="mt-5">
+              <h3 className="font-medium text-lg">{attributeGroup.name}</h3>
+              <select
+                value={selectedAttributes[`group-${groupIndex}`] || ""}
+                onChange={(e) =>
+                  handleAttributeChange(`group-${groupIndex}`, e.target.value)
+                }
+                className="p-2 border rounded"
+              >
+                <option value="">Select an option</option>
+                {attributeGroup.map((attribute, attributeIndex) => (
+                  <option key={attributeIndex} value={attribute.name}>
+                    {attribute.name}
+                  </option>
+                ))}
+              </select>
             </div>
           ))}
 
@@ -162,16 +178,21 @@ const Product = () => {
 
           {/* Add to Cart Button */}
           <button
-            onClick={() =>{
+            onClick={() => {
+              const cartData = {
+                productId: productData._id,
+                size: size,
+                price: selectedPrice,
+                attributes: selectedAttributes,
+              };
+              console.log("Cart Data:", cartData); // Log cart data for testing
               addToCart(
-                productData._id,
-                size,
-                selectedPrice,
-                selectedAttributes
-              )
-              updateAttributes('')
-            }
-            }
+                cartData.productId,
+                cartData.size,
+                cartData.price,
+                cartData.attributes
+              );
+            }}
             className="mt-5 bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
           >
             Add to Cart
