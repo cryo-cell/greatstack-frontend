@@ -1,11 +1,17 @@
 import hero from './hero.png'
 import landing from './landing.png'
 import appDownload from './appDownload.png'
+import search_icon from './search_icon.png'
+import shopping_cart from './shopping_cart.png'
+import user_icon from './user_icon.png'
 
 export const assets = {
     hero,
     landing,
-    appDownload
+    appDownload,
+    search_icon,
+    shopping_cart,
+    user_icon
 }
 
 export const products = [

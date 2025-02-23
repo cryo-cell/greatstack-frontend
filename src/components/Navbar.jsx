@@ -35,10 +35,10 @@ function Navbar() {
                 </NavLink>
         </ul>
         <div className='flex item-center gap-6'>
-            <img onClick={()=>setShowSearch(true)} src={assets.appDownload} className='w-5 cursor-pointer '/>
+            <img onClick={()=>setShowSearch(true)} src={assets.search_icon} className='w-5 cursor-pointer '/>
 
             <div className='group relative'>
-                <img onClick={()=> localStorage.getItem('token') ? null : navigate('/login')} src={assets.landing} className='w-5 cursor-pointer'/>
+                <img onClick={()=> localStorage.getItem('token') ? null : navigate('/login')} src={assets.user_icon} className='w-5 cursor-pointer'/>
                 {/*Dropdown */}
                 {localStorage.getItem('token') && 
                 <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
@@ -50,7 +50,7 @@ function Navbar() {
                 </div>}
             </div>
             <Link to="/cart" className='relative'>
-            <img src={assets.cart_icon} className='w-5nim-w-5'/>
+            <img src={assets.shopping_cart} className='w-5 nim-w-5'/>
             <p className='absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]'>{getCartCount()}</p>
             </Link>
             <img onClick={()=>setVisible(true)} src={assets.menu_icon} className='w-5 cursor-pointer sm:hidden'/>
