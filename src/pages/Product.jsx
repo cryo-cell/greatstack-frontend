@@ -19,9 +19,15 @@ const Product = () => {
       setProductData(selectedProduct);
       console.log("Product Data:", selectedProduct);
       setImage(selectedProduct.image[0]);
-      setSelectedPrice(selectedProduct.sizes[0]?.price);
+  
+      // Ensure the first size is selected by default
+      if (selectedProduct.sizes.length > 0) {
+        setSize(selectedProduct.sizes[0].size);
+        setSelectedPrice(selectedProduct.sizes[0].price);
+      }
     }
   }, [productId, products]);
+  
 
   useEffect(() => {
     if (productData) {

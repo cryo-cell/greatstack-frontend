@@ -53,7 +53,7 @@ function Navbar() {
             <img src={assets.shopping_cart} className='w-5 nim-w-5'/>
             <p className='absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]'>{getCartCount()}</p>
             </Link>
-            <img onClick={()=>setVisible(true)} src={assets.menu_icon} className='w-5 cursor-pointer sm:hidden'/>
+            <img onClick={()=>setVisible(true)} src={assets.menu} className='w-5 cursor-pointer sm:hidden'/>
         </div>
         {/*Sidebar for small screens*/}
         <div className={`absolute top-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? 'w-full': 'w-0' }`}>

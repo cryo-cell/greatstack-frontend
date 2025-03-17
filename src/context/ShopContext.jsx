@@ -49,35 +49,38 @@ const ShopContextProvider = (props) => {
 
   // Updated addToCart to handle attributes
   const addToCart = async (itemId, size, price, attributes) => {
+    const token = localStorage.getItem("token"); // Fetch the token directly
+  
     const productData = products.find((product) => product._id === itemId);
-    console.log(productData.attributes)
+    console.log(productData.attributes);
+  
     if (!size) {
       toast.error("Select Product Size");
       return;
     }
-    if (!attributes || Object.keys(attributes).length === 0) {
-      toast.error("Select Product Attributes");
+    if (!attributes || Object.keys(attributes).length !== productData?.attributes?.length) {
+      toast.error("Please select all required product attributes.");
       return;
-    }
+  }
     if (!price) {
       toast.error("No Price included");
       return;
     }
-
+  
     let cartData = structuredClone(cartItems); // Ensure no direct mutation
     console.log(cartData);
-
+  
     // Generate a unique key combining itemId, size, and attributes
     const attributeKey = generateUniqueKey(itemId, size, attributes);
     console.log("Generated attributeKey:", attributeKey);
-
+  
     console.log("Product Data for this item:", productData);
-
+  
     // Initialize cartData[itemId] if it's not already present
     if (!cartData[itemId]) {
       cartData[itemId] = {}; // Initialize if not present
     }
-
+  
     // Check if the item with the unique key already exists in the cart
     if (!cartData[itemId][attributeKey]) {
       console.log("No existing item for this key, adding new item.");
@@ -94,30 +97,37 @@ const ShopContextProvider = (props) => {
       console.log("Item already exists for this key, increasing quantity.");
       cartData[itemId][attributeKey].quantity += 1;
     }
-
+  
     // Update the cart state with the new cartData
     setCartItems(cartData);
-    console.log("Updated Cart Data:", cartData);
+    toast.success(`${productData.name} has been added to your cart!`);
 
+    console.log("Updated Cart Data:", cartData);
+  
     if (token) {
       try {
         const response = await axios.post(
           backendUrl + "/api/cart/add",
-          { itemId, size },
+          {
+            itemId,
+            size,
+            attributes, // Added attributes to request
+            name: productData.name, // Added name to request
+          },
           {
             headers: {
               token: token, // Include token in 'token' header
             },
           }
         );
-        console.log(response);
+        console.log(response.data);
       } catch (error) {
         console.log(error);
         toast.error(error.message);
       }
     }
   };
-
+  
   // Update the quantity of items in the cart
   const updateQuantity = async (itemId, size, attributes, quantity) => {
     let cartData = structuredClone(cartItems); // Deep clone cart items to avoid mutation
@@ -197,11 +207,32 @@ const ShopContextProvider = (props) => {
   };
 
   // Clear the cart
-  const clearCart = () => {
-    setCartItems({}); // Clear the cart in state
-    localStorage.removeItem("cartItems"); // Remove cart from localStorage
-    toast.success("Cart has been cleared"); // Optionally show a success message
-  };
+ // Clear the cart
+ const clearCart = async () => {
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("🔴 Missing token or userId in clearCart()");
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      backendUrl + "/api/cart/clear",
+      {}, // Ensure this matches what your controller expects
+      { headers: { token } }
+    );
+
+    console.log("🟢 clearCart Response:", response.data);
+    setCartItems({}); 
+    localStorage.removeItem("cartItems"); // Clear localStorage too
+    toast.success("Cart has been cleared successfully.");
+  } catch (error) {
+    console.error("🔴 Error clearing cart:", error.response?.data || error.message);
+    toast.error("Failed to clear cart.");
+  }
+};
+
 
   useEffect(() => {
     getProductsData();
