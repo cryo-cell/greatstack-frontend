@@ -23,10 +23,23 @@ const RelatedProducts = ({category, subCategory}) => {
         <Title text1={'RELATED'} text2={'PRODUCTS'}/>
     </div>
     <div className="grid grid-cols-2 sm:gridcols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {related.map((item,index)=>(
-            //console.log(item.sizes?item.sizes[0]:'')
-            <ProductItem key={index} id={item._id} sizes={item.sizes[0].price} image={item.image} name={item.name}/>
-        ))}
+{related.map((item, index) => {
+  const prices = item.sizes?.map(size => size.price) || []
+  const minPrice = Math.min(...prices)
+  const maxPrice = Math.max(...prices)
+
+  return (
+    <ProductItem
+      key={index}
+      id={item._id}
+      image={item.image}
+      name={item.name}
+      sizes={item.sizes}
+      minPrice={minPrice}
+      maxPrice={maxPrice}
+    />
+  )
+})}
     </div>
     </div>
   )
