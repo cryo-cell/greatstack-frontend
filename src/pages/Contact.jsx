@@ -2,7 +2,7 @@ import { Mail, MessageSquareHeart } from "lucide-react";
 
 export default function Contact() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 grid lg:grid-cols-2 gap-10">
+    <div className="max-w-4xl mx-auto px-4 py-6 grid lg:grid-cols-2 gap-10">
       <div className="space-y-6">
         <h1 className="text-4xl font-bold flex items-center gap-2">
           <Mail className="text-orange-500" /> Contact Us

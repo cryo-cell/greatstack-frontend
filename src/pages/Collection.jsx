@@ -13,28 +13,22 @@ const Collection = () => {
   const [sortType, setSortType] = useState("relavent");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
 
-  useEffect(() => {
-    const fetchFilterOptions = async () => {
-      try {
-        const [catRes, subCatRes] = await Promise.all([
-          axios.get("http://localhost:4000/api/category"),
-          axios.get("http://localhost:4000/api/subcategory"),
-        ]);
-        console.log("catRes.data:", catRes.data);
-
-        setCategoryOptions(Array.isArray(catRes.data) ? catRes.data : []);
-        setSubCategoryOptions(
-          Array.isArray(subCatRes.data) ? subCatRes.data : []
-        );
-      } catch (err) {
-        console.error("Failed to load filter options:", err.message);
-      }
-    };
-
-    fetchFilterOptions();
-  }, []);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+  useEffect(() => {
+    if (!products || products.length === 0) return;
+
+    const catSet = new Set();
+    const subSet = new Set();
+
+    products.forEach((p) => {
+      if (p.category) catSet.add(p.category);
+      if (p.subCategory) subSet.add(p.subCategory);
+    });
+
+    setCategoryOptions(Array.from(catSet));
+    setSubCategoryOptions(Array.from(subSet));
+  }, [products]);
 
   useEffect(() => {
     if (products && products.length > 0) {
@@ -83,18 +77,18 @@ const Collection = () => {
 
     // Price Range
     if (priceRange) {
-  const min = parseFloat(priceRange.min) || 0;
-  const max = parseFloat(priceRange.max) || Infinity;
+      const min = parseFloat(priceRange.min) || 0;
+      const max = parseFloat(priceRange.max) || Infinity;
 
-  productsCopy = productsCopy.filter((item) => {
-    const prices = item.sizes.map((s) => s.price);
-    const itemMinPrice = Math.min(...prices);
-    const itemMaxPrice = Math.max(...prices);
+      productsCopy = productsCopy.filter((item) => {
+        const prices = item.sizes.map((s) => s.price);
+        const itemMinPrice = Math.min(...prices);
+        const itemMaxPrice = Math.max(...prices);
 
-    // Check if the item's price range overlaps with filter range
-    return itemMinPrice <= max && itemMaxPrice >= min;
-  });
-}
+        // Check if the item's price range overlaps with filter range
+        return itemMinPrice <= max && itemMaxPrice >= min;
+      });
+    }
 
     // Sort
     switch (sortType) {
@@ -126,7 +120,7 @@ const Collection = () => {
   useEffect(() => {
     applyFilter();
   }, [category, subCategory, search, showSearch, priceRange, sortType]);
-  
+
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
       {/*Filter Options*/}
@@ -145,15 +139,15 @@ const Collection = () => {
         >
           <p className="mb-3 text-sm font-medium">CATEGORIES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gra-700">
-            {categoryOptions.map((cat) => (
-              <p key={cat._id} className="flex gap-2">
+            {categoryOptions.map((cat, index) => (
+              <p key={index} className="flex gap-2">
                 <input
                   className="w-3"
                   type="checkbox"
-                  value={cat.name}
+                  value={cat}
                   onChange={toggleCategory}
                 />
-                {cat.name}
+                {cat}
               </p>
             ))}
           </div>
@@ -166,15 +160,15 @@ const Collection = () => {
         >
           <p className="mb-3 text-sm font-medium">TYPE</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gra-700">
-            {subCategoryOptions.map((cat) => (
-              <p key={cat._id} className="flex gap-2">
+            {subCategoryOptions.map((sub, index) => (
+              <p key={index} className="flex gap-2">
                 <input
                   className="w-3"
                   type="checkbox"
-                  value={cat.name}
+                  value={sub}
                   onChange={toggleSubCategory}
                 />
-                {cat.name}
+                {sub}
               </p>
             ))}
           </div>

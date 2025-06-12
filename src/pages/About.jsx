@@ -4,7 +4,7 @@ import React from 'react'
 
 export default function About() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 space-y-8">
+    <div className="max-w-3xl mx-auto px-4 py-6">
       <h1 className="text-4xl font-bold text-center">About Meta Store</h1>
 
       <p className="text-lg text-gray-700 text-center">
