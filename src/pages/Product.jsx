@@ -59,11 +59,27 @@ const Product = () => {
     setSize(size);
     setSelectedPrice(price);
   };
+const areAllAttributesSelected = () => {
+  if (!productData?.attributeGroups) return true; // no attributes means nothing to select
+
+  return productData.attributeGroups.every((group) => {
+    const selectedValue = selectedAttributes[group.name];
+
+    if (group.type === "checkbox") {
+      // For checkbox groups, make sure there's at least one selected
+      return Array.isArray(selectedValue) && selectedValue.length > 0;
+    } else {
+      // For radio/select groups, value must be a non-empty string
+      return typeof selectedValue === "string" && selectedValue.trim() !== "";
+    }
+  });
+};
 
   const renderAttributes = () => {
     if (!productData?.attributeGroups || productData.attributeGroups.length === 0) {
       return <p>No attribute groups available.</p>;
     }
+
 
     return productData.attributeGroups.map((group, groupIndex) => (
       <div key={groupIndex} className="mt-5">
@@ -175,25 +191,34 @@ const Product = () => {
 
           {/* Add to Cart Button */}
           <button
-            onClick={() => {
-              const cartData = {
-                productId: productData._id,
-                size: size,
-                price: selectedPrice,
-                attributes: selectedAttributes,
-              };
-              console.log("Cart Data:", cartData);
-              addToCart(
-                cartData.productId,
-                cartData.size,
-                cartData.price,
-                cartData.attributes
-              );
-            }}
-            className="mt-5 bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
-          >
-            Add to Cart
-          </button>
+  disabled={!areAllAttributesSelected() || !size}
+  onClick={() => {
+    if (!areAllAttributesSelected() || !size) {
+      alert("Please select all required attributes and size.");
+      return;
+    }
+    const cartData = {
+      productId: productData._id,
+      size: size,
+      price: selectedPrice,
+      attributes: selectedAttributes,
+    };
+    console.log("Cart Data:", cartData);
+    addToCart(
+      cartData.productId,
+      cartData.size,
+      cartData.price,
+      cartData.attributes
+    );
+  }}
+  className={`mt-5 px-8 py-3 text-sm ${
+    !areAllAttributesSelected() || !size
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-black text-white active:bg-gray-700"
+  }`}
+>
+  Add to Cart
+</button>
 
           <hr className="mt-8 sm:w-4/5" />
         </div>

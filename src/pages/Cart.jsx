@@ -4,14 +4,8 @@ import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
 
 function Cart() {
-  const {
-    products,
-    currency,
-    cartItems,
-    updateQuantity,
-    navigate,
-    clearCart
-  } = useContext(ShopContext);
+  const { products, currency, cartItems, updateQuantity, navigate, clearCart } =
+    useContext(ShopContext);
 
   const [cartData, setCartData] = useState([]);
 
@@ -33,23 +27,23 @@ function Cart() {
 
   // Generate a unique key based on size and attributes
   const generateUniqueKey = (itemId, size, attributes) => {
-    // Extract only the first attribute key-value pair
-    const [selectedKey, selectedValue] = attributes || [];
-  
-    // Combine itemId, size, and the selected attribute for a unique key
-    return `${itemId}-${size}-${selectedKey}:${selectedValue}`;
+    if (!attributes || typeof attributes !== "object")
+      return `${itemId}-${size}`;
+
+    const entries = Object.entries(attributes).sort(); // ensures consistent order
+    const attrString = entries.map(([key, val]) => `${key}:${val}`).join("-");
+    return `${itemId}-${size}-${attrString}`;
   };
-  
 
   // Function to render attributes as key-value pairs
   const renderAttributes = (attributes) => {
     if (!attributes || Object.keys(attributes).length === 0) {
       return <p>No attributes available</p>;
     }
-  
+
     return Object.entries(attributes).map(([key, value]) => {
       const attributeKey = `${key}-${value}`;
-  
+
       if (typeof value === "object" && value !== null) {
         // If the value is an object, render it in a readable way
         return (
@@ -59,17 +53,18 @@ function Cart() {
         );
       } else {
         return (
-          <div key={JSON.stringify(attributeKey)} className="px-2 sm:px-13 sm:py-1 border bg-slate-50">
-             {value}
+          <div
+            key={JSON.stringify(attributeKey)}
+            className="px-2 sm:px-13 sm:py-1 border bg-slate-50"
+          >
+            {value}
           </div>
         );
       }
     });
   };
-  
 
   const handleRemoveItem = (item) => {
-    const uniqueKey = generateUniqueKey(item.size, item.attributes);
     updateQuantity(item._id, item.size, item.attributes, 0); // Remove item by setting quantity to 0
   };
 
@@ -86,60 +81,79 @@ function Cart() {
 
           const itemAttributes = item.attributes || {}; // Default to empty object if attributes are undefined
 
-          const uniqueKey = generateUniqueKey(item.size, itemAttributes);
+          const uniqueKey = generateUniqueKey(
+            item._id,
+            item.size,
+            itemAttributes
+          );
 
           return (
             <div
               key={uniqueKey} // Ensure each item has a unique key
-              className="py-4 border-b text-gray-700 grid grid-cols-[4fr_0.5_-.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
+              className="border p-3 mb-6 mt-6 border-b text-gray-700 grid grid-cols-[4fr_0.5_-.5fr] sm:grid-cols-[4fr_4fr_4fr] "
             >
-              <div className="flex items-start gap-6">
+              <div className="mb-2 lg:mb-none md:mb-none flex items-start gap-6">
                 <img className="w-16" src={item.image[0]} alt={item.name} />
                 <div>
                   <p className="text-xs sm:text-lg font-medium">{item.name}</p>
-                  <div className="flex items-center gap-5 mt-2">
+                  <div className="flex items-center gap-2 mt-2">
                     <p>
                       {currency}
                       {item.price}
                     </p>
-
                     <p className="px-2 sm:px-13 sm:py-1 border bg-slate-50">
                       {item.size}
                     </p>
-
-                    {renderAttributes(itemAttributes)} {/* Render attributes per item */}
+                    {renderAttributes(itemAttributes)}{" "}
+                    {/* Render attributes per item */}
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="quantity">Qty</label>
-                <input
-                  value={item.quantity}
-                  onChange={(e) => {
-                    const newQuantity = Number(e.target.value);
-                    if (newQuantity > 0) {
-                      updateQuantity(
-                        item._id,
-                        item.size,
-                        itemAttributes,
-                        newQuantity
-                      );
-                    }
-                  }}
-                  className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
-                  type="number"
-                  min={1}
-                  name="quantity"
-                />
-              </div>
+              <div className="p-6 border lg:col-start-3 md:col-start-3 md:ml-auto flex flex-row lg:ml-auto lg:flex-col lg:items-center">
+                <div className="border mt-auto flex flex-col items-center">
+                  <label htmlFor="quantity">Qty</label>
+                  <div className="flex items-center ">
+                    <button
+                      onClick={() =>
+                        updateQuantity(
+                          item._id,
+                          item.size,
+                          item.attributes,
+                          Math.max(item.quantity - 1, 0)
+                        )
+                      }
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-black bg-opacity-10 hover:bg-opacity-20 transition"
+                      aria-label="Decrease quantity"
+                    >
+                      –
+                    </button>
 
-              <p
-                onClick={() => handleRemoveItem(item)} // Remove item on click
-                className="cursor-pointer text-red-500"
-              >
-                remove
-              </p>
+                    <span className="w-8 text-center">{item.quantity}</span>
+
+                    <button
+                      onClick={() =>
+                        updateQuantity(
+                          item._id,
+                          item.size,
+                          item.attributes,
+                          item.quantity + 1
+                        )
+                      }
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-black bg-opacity-10 hover:bg-opacity-20 transition"
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p
+                    onClick={() => handleRemoveItem(item)} // Remove item on click
+                    className=" cursor-pointer text-red-500 mt-auto"
+                  >
+                    remove
+                  </p>
+                </div>
+              </div>
             </div>
           );
         })}

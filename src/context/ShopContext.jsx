@@ -27,51 +27,64 @@ const ShopContextProvider = (props) => {
   }, [cartItems]);
 
   // Generate a unique key for each combination of itemId, size, and attributes
-  const generateUniqueKey = (itemId, size, attributes = {}) => {
-    const stringifyAttributes = (attributes) => {
-      if (!attributes || typeof attributes !== "object") return "";
-  
-      return Object.entries(attributes)
-        .map(([key, value]) => {
-          if (typeof value === "object" && value !== null) {
-            return `${key}:{${stringifyAttributes(value)}}`; // Recursively handle nested attributes
-          } else {
-            return `${key}:${value}`;
-          }
-        })
-        .join("-");
-    };
-  
-    const attributesKey = stringifyAttributes(attributes);
-    return `${itemId}-${size}-${attributesKey}`; // Combine itemId, size, and attributes into a unique key
+  const generateUniqueKey = (itemId, size, attributes = {}, productName = "") => {
+  const stringifyAttributes = (attributes) => {
+    if (!attributes || typeof attributes !== "object") return "";
+
+    return Object.entries(attributes)
+      .map(([key, value]) => {
+        if (typeof value === "object" && value !== null) {
+          return `${key}:{${stringifyAttributes(value)}}`; // Recursively handle nested attributes
+        } else {
+          return `${key}:${value}`;
+        }
+      })
+      .join("-");
   };
-  
+
+  const attributesKey = stringifyAttributes(attributes);
+  // Include productName in the key. Sanitize if needed to avoid spaces or special chars
+  const safeName = productName.replace(/\s+/g, "_").toLowerCase(); // example sanitation
+
+  return `${safeName}-${itemId}-${size}-${attributesKey}`; // Now includes name
+};
+
 
   // Updated addToCart to handle attributes
   const addToCart = async (itemId, size, price, attributes) => {
     const token = localStorage.getItem("token"); // Fetch the token directly
   
     const productData = products.find((product) => product._id === itemId);
-    console.log(productData.attributes);
+    console.log("ye", productData.attributes);
   
     if (!size) {
       toast.error("Select Product Size");
       return;
     }
-    if (!attributes || Object.keys(attributes).length !== productData?.attributes?.length) {
-      toast.error("Please select all required product attributes.");
-      return;
-  }
+    const requiredAttributes = productData?.attributes || [];
+const selectedAttributes = attributes || {};
+console.log("🔍 Required attributes from product:", requiredAttributes);
+console.log("🛒 Selected attributes:", selectedAttributes);
+const missingAttributes = requiredAttributes.filter(attr => {
+  const name = attr.name;
+  return !(name in selectedAttributes) || selectedAttributes[name] === null || selectedAttributes[name] === "";
+});
+
+if (missingAttributes.length > 0) {
+  toast.error("Please select all required product attributes.");
+  return;
+}
+
     if (!price) {
       toast.error("No Price included");
       return;
     }
   
     let cartData = structuredClone(cartItems); // Ensure no direct mutation
-    console.log(cartData);
+    //console.log(cartData);
   
     // Generate a unique key combining itemId, size, and attributes
-    const attributeKey = generateUniqueKey(itemId, size, attributes);
+    const attributeKey = generateUniqueKey( itemId, size, attributes);
     console.log("Generated attributeKey:", attributeKey);
   
     console.log("Product Data for this item:", productData);
@@ -113,6 +126,7 @@ const ShopContextProvider = (props) => {
             size,
             attributes, // Added attributes to request
             name: productData.name, // Added name to request
+            price,
           },
           {
             headers: {
@@ -130,41 +144,39 @@ const ShopContextProvider = (props) => {
   
   // Update the quantity of items in the cart
   const updateQuantity = async (itemId, size, attributes, quantity) => {
-    let cartData = structuredClone(cartItems); // Deep clone cart items to avoid mutation
+  let cartData = structuredClone(cartItems);
+  const attributeKey = generateUniqueKey(itemId, size, attributes);
+  const token = localStorage.getItem("token");
 
-    // Generate the unique attribute key
-    const attributeKey = generateUniqueKey(itemId, size, attributes);
-
-    console.log("Updating item with key:", attributeKey);
-
-    // Check if the item exists in the cart
-    if (cartData[itemId]) {
-      // Check if the specific size and attributes exist in the cart for this product
-      if (cartData[itemId][attributeKey]) {
-        // Update quantity if the key exists
-        if (quantity === 0) {
-          // If quantity is 0, remove the item from the cart
-          console.log("Removing item with itemId:", itemId, "and key:", attributeKey);
-          delete cartData[itemId][attributeKey];
-
-          // If no other items for this product exist, delete the product from the cart
-          if (Object.keys(cartData[itemId]).length === 0) {
-            delete cartData[itemId];
-          }
-        } else {
-          // Update the quantity of the item
-          cartData[itemId][attributeKey].quantity = quantity; // Update the quantity
-        }
-      } else {
-        console.log("Item not found in cart with this key:", attributeKey);
+  if (cartData[itemId] && cartData[itemId][attributeKey]) {
+    if (quantity === 0) {
+      delete cartData[itemId][attributeKey];
+      if (Object.keys(cartData[itemId]).length === 0) {
+        delete cartData[itemId];
       }
     } else {
-      console.log("Product not found in cart.");
+      cartData[itemId][attributeKey].quantity = quantity;
     }
+  }
 
-    // Set the updated cart data into the state
-    setCartItems(cartData);
-  };
+  setCartItems(cartData);
+
+  // 🔥 Backend sync
+  if (token) {
+    try {
+      await axios.post(
+  backendUrl + "/api/cart/update",
+  { itemId, size, attributes, quantity },
+  { headers: { token } }
+);
+
+    } catch (err) {
+      console.error("Error syncing cart with DB:", err);
+      toast.error("Failed to sync cart changes.");
+    }
+  }
+};
+
 
   // Get total cart count (number of items)
   const getCartCount = () => {
