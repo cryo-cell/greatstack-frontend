@@ -180,7 +180,7 @@ const Collection = () => {
           </div>
         </div>
         {/* Price Filter */}
-        <div className={`border border-gray-300 pl-5 py-3 mt-6`}>
+        <div className={`border border-gray-300  p-5 mt-6`}>
           <p className="mb-3 text-sm font-medium">PRICE RANGE</p>
           <p className="text-xs text-gray-500">
             Showing items between ${priceRange.min} and ${priceRange.max}

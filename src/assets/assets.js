@@ -6,7 +6,7 @@ import shopping_cart from './shopping_cart.png'
 import user_icon from './user_icon.png'
 import menu from './menu.png'
 import usfLogo from './usfLogo.png'
-
+import metaStoreLogo from './metaStoreLogo.png'
 
 export const assets = {
     hero,
@@ -16,7 +16,8 @@ export const assets = {
     shopping_cart,
     user_icon,
     menu,
-    usfLogo
+    usfLogo,
+    metaStoreLogo
 }
 
 export const products = [

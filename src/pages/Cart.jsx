@@ -55,7 +55,7 @@ function Cart() {
         return (
           <div
             key={JSON.stringify(attributeKey)}
-            className="px-2 sm:px-13 sm:py-1 border bg-slate-50"
+            className="px-2 sm:px-13 sm:py-1  bg-slate-50"
           >
             {value}
           </div>
@@ -69,7 +69,7 @@ function Cart() {
   };
 
   return (
-    <div className="border-t pt-14">
+    <div className="-t pt-14">
       <div className="text-2xl mb-3">
         <Title text1={"YOUR"} text2={"CART"} />
       </div>
@@ -90,7 +90,7 @@ function Cart() {
           return (
             <div
               key={uniqueKey} // Ensure each item has a unique key
-              className="border p-3 mb-6 mt-6 border-b text-gray-700 grid grid-cols-[4fr_0.5_-.5fr] sm:grid-cols-[4fr_4fr_4fr] "
+              className=" p-3 mb-6 mt-6 border-b text-gray-700 grid grid-cols-[4fr_0.5_-.5fr] sm:grid-cols-[4fr_4fr_4fr] "
             >
               <div className="mb-2 lg:mb-none md:mb-none flex items-start gap-6">
                 <img className="w-16" src={item.image[0]} alt={item.name} />
@@ -101,7 +101,7 @@ function Cart() {
                       {currency}
                       {item.price}
                     </p>
-                    <p className="px-2 sm:px-13 sm:py-1 border bg-slate-50">
+                    <p className="px-2 sm:px-13 sm:py-1  bg-slate-50">
                       {item.size}
                     </p>
                     {renderAttributes(itemAttributes)}{" "}
@@ -110,8 +110,8 @@ function Cart() {
                 </div>
               </div>
 
-              <div className="p-6 border lg:col-start-3 md:col-start-3 md:ml-auto flex flex-row lg:ml-auto lg:flex-col lg:items-center">
-                <div className="border mt-auto flex flex-col items-center">
+              <div className="p-6  lg:col-start-3 md:col-start-3 md:ml-auto flex flex-row lg:ml-auto lg:flex-col lg:items-center">
+                <div className=" mt-auto flex flex-col items-center">
                   <label htmlFor="quantity">Qty</label>
                   <div className="flex items-center ">
                     <button
