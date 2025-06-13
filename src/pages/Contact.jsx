@@ -26,41 +26,33 @@ export default function Contact() {
         </div>
       </div>
 
-      <form className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium">Name</label>
-          <input
-            type="text"
-            placeholder="Your name"
-            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-        </div>
+      <form 
+  action="https://formsubmit.co/cryobabbi@gmail.com" 
+  method="POST"
+  className="space-y-4"
+>
+  <input type="hidden" name="_captcha" value="false" />
 
-        <div>
-          <label className="block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-        </div>
+  <div>
+    <label className="block text-sm font-medium">Name</label>
+    <input name="name" type="text" required placeholder="Your name" className="..." />
+  </div>
 
-        <div>
-          <label className="block text-sm font-medium">Message</label>
-          <textarea
-            placeholder="What are you looking for?"
-            rows={5}
-            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-        </div>
+  <div>
+    <label className="block text-sm font-medium">Email</label>
+    <input name="email" type="email" required placeholder="you@example.com" className="..." />
+  </div>
 
-        <button
-          type="submit"
-          className="bg-orange-500 text-white font-semibold rounded px-4 py-2 hover:bg-orange-600 transition"
-        >
-          Send Message
-        </button>
-      </form>
+  <div>
+    <label className="block text-sm font-medium">Message</label>
+    <textarea name="message" required placeholder="What are you looking for?" rows={5} className="w-full" />
+  </div>
+
+  <button type="submit"           className="bg-orange-500 text-white font-semibold rounded px-4 py-2 hover:bg-orange-600 transition"
+>Send Message</button>
+</form>
+
     </div>
   );
 }
+
