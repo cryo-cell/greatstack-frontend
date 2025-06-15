@@ -1,3 +1,4 @@
+import AddressAutocomplete from "./AddressAutocomplete";
 import React, { useContext, useState, useEffect } from "react";
 import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
@@ -20,11 +21,7 @@ function PlaceOrder() {
     firstName: "",
     lastName: "",
     email: "",
-    street: "",
-    city: "",
-    state: "",
-    zipcode: "",
-    country: "",
+    fullAddress: "",
     phone: "",
     createAccount: false,
     password: "",
@@ -68,6 +65,8 @@ function PlaceOrder() {
         address: formData,
         items: orderItems,
         amount: getCartAmount(),
+        taxRate: taxRate, // <-- Add tax rate
+        taxAmount: getCartAmount() * taxRate, // optional: precalc tax amount
       };
 
       console.log(token);
@@ -112,12 +111,133 @@ function PlaceOrder() {
     }
   };
   useEffect(() => {
-  const isCartEmpty = Object.keys(cartItems).length === 0;
-  if (isCartEmpty) {
-    toast.info("Your cart is empty. Add items before checking out.");
-    navigate('/');
-  }
-}, [cartItems, navigate]);
+    const isCartEmpty = Object.keys(cartItems).length === 0;
+    if (isCartEmpty) {
+      toast.info("Your cart is empty. Add items before checking out.");
+      navigate("/");
+    }
+  }, [cartItems, navigate]);
+  const taxRatesByState = {
+    AL: 0.11,
+    AK: 0.075,
+    AZ: 0.112,
+    AR: 0.115,
+    CA: 0.1025,
+    CO: 0.112,
+    CT: 0.0635,
+    DE: 0.0,
+    FL: 0.08,
+    GA: 0.09,
+    HI: 0.045,
+    ID: 0.09,
+    IL: 0.11,
+    IN: 0.07,
+    IA: 0.08,
+    KS: 0.106,
+    KY: 0.06,
+    LA: 0.1145,
+    ME: 0.055,
+    MD: 0.06,
+    MA: 0.0625,
+    MI: 0.06,
+    MN: 0.08375,
+    MS: 0.08,
+    MO: 0.101,
+    MT: 0.0,
+    NE: 0.075,
+    NV: 0.08265,
+    NH: 0.0,
+    NJ: 0.0663,
+    NM: 0.090625,
+    NY: 0.08875,
+    NC: 0.075,
+    ND: 0.085,
+    OH: 0.08,
+    OK: 0.115,
+    OR: 0.0,
+    PA: 0.08,
+    RI: 0.07,
+    SC: 0.09,
+    SD: 0.065,
+    TN: 0.1,
+    TX: 0.0825,
+    UT: 0.087,
+    VT: 0.07,
+    VA: 0.07,
+    WA: 0.104,
+    DC: 0.06,
+    WV: 0.07,
+    WI: 0.056,
+    WY: 0.06,
+  };
+  const stateNameToCode = {
+    
+  "Alabama": "AL",
+  "Alaska": "AK",
+  "Arizona": "AZ",
+  "Arkansas": "AR",
+  "California": "CA",
+  "Colorado": "CO",
+  "Connecticut": "CT",
+  "Delaware": "DE",
+  "Florida": "FL",
+  "Georgia": "GA",
+  "Hawaii": "HI",
+  "Idaho": "ID",
+  "Illinois": "IL",
+  "Indiana": "IN",
+  "Iowa": "IA",
+  "Kansas": "KS",
+  "Kentucky": "KY",
+  "Louisiana": "LA",
+  "Maine": "ME",
+  "Maryland": "MD",
+  "Massachusetts": "MA",
+  "Michigan": "MI",
+  "Minnesota": "MN",
+  "Mississippi": "MS",
+  "Missouri": "MO",
+  "Montana": "MT",
+  "Nebraska": "NE",
+  "Nevada": "NV",
+  "New Hampshire": "NH",
+  "New Jersey": "NJ",
+  "New Mexico": "NM",
+  "New York": "NY",
+  "North Carolina": "NC",
+  "North Dakota": "ND",
+  "Ohio": "OH",
+  "Oklahoma": "OK",
+  "Oregon": "OR",
+  "Pennsylvania": "PA",
+  "Rhode Island": "RI",
+  "South Carolina": "SC",
+  "South Dakota": "SD",
+  "Tennessee": "TN",
+  "Texas": "TX",
+  "Utah": "UT",
+  "Vermont": "VT",
+  "Virginia": "VA",
+  "Washington": "WA",
+  "Washington, D.C.": "DC",
+  "West Virginia": "WV",
+  "Wisconsin": "WI",
+  "Wyoming": "WY"
+}
+
+  
+  const getTaxRate = (state, country) => {
+    let stateCode = state;
+    if (country === "United States") {
+      // If full state name, convert to code
+      if (state.length > 2) {
+        stateCode = stateNameToCode[state] || "";
+      }
+      return taxRatesByState[stateCode] || 0;
+    }
+    return 0;
+  };
+  const [taxRate, setTaxRate] = useState(0);
 
   return (
     <form
@@ -159,57 +279,26 @@ function PlaceOrder() {
           placeholder="Email address"
           className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
         />
-        <input
-          required
-          onChange={onChangeHandler}
-          name="street"
-          value={formData.street}
-          type="text"
-          placeholder="Street"
-          className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
+        <AddressAutocomplete
+          onSelect={(place) => {
+            const { address } = place;
+            const state = address.state || "";
+            const country = address.country || "";
+
+            const rate = getTaxRate(state, country);
+            setTaxRate(rate);
+
+            setFormData((prev) => ({
+              ...prev,
+              fullAddress: place.display_name,
+              street: address.road || "",
+              city: address.city || address.town || "",
+              state,
+              zipcode: address.postcode || "",
+              country,
+            }));
+          }}
         />
-
-        <div className="flex gap-3">
-          <input
-            required
-            onChange={onChangeHandler}
-            name="city"
-            value={formData.city}
-            type="text"
-            placeholder="City"
-            className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
-          />
-          <input
-            required
-            onChange={onChangeHandler}
-            name="state"
-            value={formData.state}
-            type="text"
-            placeholder="State"
-            className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <input
-            required
-            onChange={onChangeHandler}
-            name="zipcode"
-            value={formData.zipcode}
-            type="number"
-            placeholder="Zipcode"
-            className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
-          />
-          <input
-            required
-            onChange={onChangeHandler}
-            name="country"
-            value={formData.country}
-            type="text"
-            placeholder="Country"
-            className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
-          />
-        </div>
 
         <input
           required
@@ -221,49 +310,67 @@ function PlaceOrder() {
           className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
         />
         {!token && (
-          <>
-            <label className="flex gap-2 items-center text-sm">
-              <input
-                type="checkbox"
-                checked={formData.createAccount}
-                onChange={() =>
-                  setFormData((data) => ({
-                    ...data,
-                    createAccount: !data.createAccount,
-                  }))
-                }
-              />
-              Create an account with this email
-            </label>
-            {formData.createAccount && (
-              <>
+          <div className="mb-6">
+            <p className="mb-2 font-semibold">Checkout as:</p>
+            <div className="flex gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  required
+                  type="radio"
+                  name="checkoutType"
+                  value="guest"
+                  checked={!formData.createAccount}
+                  onChange={() =>
+                    setFormData((data) => ({ ...data, createAccount: false }))
+                  }
+                />
+                Guest
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="checkoutType"
+                  value="createAccount"
+                  checked={formData.createAccount}
+                  onChange={() =>
+                    setFormData((data) => ({ ...data, createAccount: true }))
+                  }
+                />
+                Create an Account
+              </label>
+            </div>
+
+            {formData.createAccount && (
+              <div className="mt-4">
+                <input
+                  required={formData.createAccount}
                   onChange={onChangeHandler}
                   name="password"
                   type="password"
                   placeholder="Password"
-                  value={formData.password}
-                  className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
+                  value={formData.password || ""}
+                  className="border border-gray-500 rounded py-1.5 px-3.5 w-full mb-2"
+                  autoComplete="new-password"
                 />
                 <input
-                  required
+                  required={formData.createAccount}
                   onChange={onChangeHandler}
                   name="confirmPassword"
                   type="password"
                   placeholder="Confirm Password"
-                  value={formData.confirmPassword}
+                  value={formData.confirmPassword || ""}
                   className="border border-gray-500 rounded py-1.5 px-3.5 w-full"
+                  autoComplete="new-password"
                 />
-              </>
+              </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
       <div className="mt-8">
         <div className="mt-8 min-w-80">
-          <CartTotal />
+          <CartTotal taxRate={taxRate} />
         </div>
 
         <div className="mt-12">
