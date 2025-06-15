@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { Link, NavLink } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
+import { Search, X } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 function Navbar() {
   const [visible, setVisible] = useState(false);
@@ -20,6 +22,8 @@ function Navbar() {
     setToken("");
     setCartItems({});
   };
+  const location = useLocation();
+  const isCollectionPage = location.pathname.includes("/collection");
 
   return (
     <div className="w-full font-medium">
@@ -27,7 +31,11 @@ function Navbar() {
       <div className="flex h-12 md:h-32 lg:h-36 w-full">
         <div className="flex items-center ">
           <Link to="/">
-            <img src={assets.metaStoreLogo} className="w-36 object-contain" alt="Logo" />
+            <img
+              src={assets.metaStoreLogo}
+              className="w-36 object-contain"
+              alt="Logo"
+            />
           </Link>
         </div>
         <div
@@ -58,11 +66,14 @@ function Navbar() {
 
       {/* Icons Row */}
       <div className="flex items-center gap-6 px-4 py-3 justify-end">
-        <img
-          onClick={() => setShowSearch(true)}
-          src={assets.search_icon}
-          className="w-5 cursor-pointer"
-        />
+        {isCollectionPage && (
+          <button
+            onClick={() => setShowSearch(true)}
+            className="p-1 hover:opacity-80"
+          >
+            <Search size={20} />
+          </button>
+        )}
 
         <div className="group relative">
           <img
@@ -72,12 +83,14 @@ function Navbar() {
             src={assets.user_icon}
             className="w-5 cursor-pointer"
           />
-          {/* Dropdown */}
           {localStorage.getItem("token") && (
             <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
               <div className="flex flex-col gap-2 w-36 py-3 px-2 bg-slate-100 text-gray-500 rounded">
                 <p className="cursor-pointer hover:text-black">My Profile</p>
-                <p onClick={() => navigate("/orders")} className="cursor-pointer hover:text-black">
+                <p
+                  onClick={() => navigate("/orders")}
+                  className="cursor-pointer hover:text-black"
+                >
                   Orders
                 </p>
                 <p onClick={logout} className="cursor-pointer hover:text-black">
@@ -116,16 +129,32 @@ function Navbar() {
             <img className="h-4 rotate-100" src={assets.dropdown_icon} alt="" />
             <p>Back</p>
           </div>
-          <NavLink onClick={() => setVisible(false)} className="py-2 pl-6 border" to="/collection">
+          <NavLink
+            onClick={() => setVisible(false)}
+            className="py-2 pl-6 border"
+            to="/collection"
+          >
             COLLECTION
           </NavLink>
-          <NavLink onClick={() => setVisible(false)} className="py-2 pl-6 border" to="/about">
+          <NavLink
+            onClick={() => setVisible(false)}
+            className="py-2 pl-6 border"
+            to="/about"
+          >
             ABOUT
           </NavLink>
-          <NavLink onClick={() => setVisible(false)} className="py-2 pl-6 border" to="/contact">
+          <NavLink
+            onClick={() => setVisible(false)}
+            className="py-2 pl-6 border"
+            to="/contact"
+          >
             CONTACT
           </NavLink>
-          <NavLink onClick={() => setVisible(false)} className="py-2 pl-6 border" to="/">
+          <NavLink
+            onClick={() => setVisible(false)}
+            className="py-2 pl-6 border"
+            to="/"
+          >
             HOME
           </NavLink>
         </div>

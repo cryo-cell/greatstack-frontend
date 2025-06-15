@@ -222,17 +222,12 @@ if (missingAttributes.length > 0) {
  // Clear the cart
  const clearCart = async () => {
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    console.error("🔴 Missing token or userId in clearCart()");
-    return;
-  }
+  
 
   try {
     const response = await axios.post(
       backendUrl + "/api/cart/clear",
       {}, // Ensure this matches what your controller expects
-      { headers: { token } }
     );
 
     console.log("🟢 clearCart Response:", response.data);

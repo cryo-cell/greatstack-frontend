@@ -1,30 +1,44 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { ShopContext } from '../context/ShopContext'
-import { assets } from '../assets/assets'
-import { useLocation } from 'react-router-dom'
-
+import React, { useContext, useEffect, useState } from "react";
+import { ShopContext } from "../context/ShopContext";
+import { assets } from "../assets/assets";
+import { useLocation } from "react-router-dom";
+import { Search, X } from "lucide-react";
 function SearchBar() {
-    const {search, setSearch, showSearch, setShowSearch} = useContext(ShopContext)
-    const [visible, setVisible] = useState(false)  
-    const location = useLocation()
+  const { search, setSearch, showSearch, setShowSearch } =
+    useContext(ShopContext);
+  const [visible, setVisible] = useState(false);
+  const location = useLocation();
 
-    useEffect(()=>{
-        if(location.pathname.includes('collection') ){
-            setVisible(true)
-        }
-        else{
-            setVisible(false)
-        }
-    },[location])
-  return showSearch && visible ? (
-    <div className='border-t borer-b bg-gray-50 text-center'>
-      <div className='inline-flex items-center justify-center border border-gray-400 px-5 py-2 my-5 mx-3 rounded-full w-3/4 sm:w-1/2'>
-        <input value={search} onChange={(e)=>setSearch(e.target.value)} type="search     " />
-        <img className="w-4" src={assets.search_icon} alt="" />
+  useEffect(() => {
+    setVisible(location.pathname.includes("collection"));
+  }, [location]);
+
+  if (!showSearch || !visible) return null;
+
+  return (
+    <div className="border-t border-b bg-gray-50 text-center py-4">
+      <div className="relative mx-auto w-11/12 sm:w-2/3 md:w-1/2">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          type="search"
+          placeholder="Search products..."
+          className="w-full pl-10 pr-10 py-2 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <img
+          src={assets.search_icon}
+          alt="Search"
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 opacity-60"
+        />
+        <button
+          onClick={() => setShowSearch(false)}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 opacity-60 hover:opacity-100"
+        >
+          <X size={20} />{" "}
+        </button>
       </div>
-      <img onClick={()=>setShowSearch(false)} className="inline w-3 h-3 cursor-pointer border" src={assets.cross_icon} alt="" />
     </div>
-  ): null
+  );
 }
 
-export default SearchBar
+export default SearchBar;
