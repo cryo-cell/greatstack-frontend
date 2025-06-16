@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
+import { getTaxRate, stateNameToCode } from "../../../backend/utils/taxUtils";
 
 function Cart() {
   const { products, currency, cartItems, updateQuantity, navigate, clearCart } =
@@ -67,7 +68,12 @@ function Cart() {
   const handleRemoveItem = (item) => {
     updateQuantity(item._id, item.size, item.attributes, 0); // Remove item by setting quantity to 0
   };
-
+  const [selectedState, setSelectedState] = useState("");
+  const [country, setCountry] = useState("United States");
+  const handleStateChange = (e) => {
+    setSelectedState(e.target.value);
+  };
+  const taxRate = getTaxRate(selectedState, country);
   return (
     <div className="-t pt-14">
       <div className="text-2xl mb-3">
@@ -167,7 +173,19 @@ function Cart() {
 
       <div className="flex justify-end my-20">
         <div className="w-full sm:w-[450px]">
-          <CartTotal />
+          <div>
+            <label>Select your state:</label>
+            <select value={selectedState} onChange={handleStateChange}>
+              <option value="">-- Select State --</option>
+              {Object.keys(stateNameToCode).map((stateName) => (
+                <option key={stateName} value={stateName}>
+                  {stateName}
+                </option>
+              ))}
+            </select>
+
+            <CartTotal taxRate={taxRate} />
+          </div>{" "}
           <div className="w-full text-end">
             <button
               onClick={() => navigate("/place-order")}
