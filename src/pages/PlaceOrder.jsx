@@ -6,7 +6,7 @@ import { assets } from "../assets/assets";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { getTaxRate } from "../../../backend/utils/taxUtils";
+import { getTaxRate } from "../utils/taxUtils";
 
 function PlaceOrder() {
 

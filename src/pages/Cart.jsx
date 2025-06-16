@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
-import { getTaxRate, stateNameToCode } from "../../../backend/utils/taxUtils";
+import { getTaxRate, stateNameToCode } from "../utils/taxUtils.js";
 
 function Cart() {
   const { products, currency, cartItems, updateQuantity, navigate, clearCart } =
